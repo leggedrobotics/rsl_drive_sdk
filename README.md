@@ -1,4 +1,4 @@
-# rsl_drive_sdk SDK
+# rsl_drive_sdk 
 
 Software Development Kit for all RSL drives.\
 The source code is released under  [BSD 3](LICENSE).
