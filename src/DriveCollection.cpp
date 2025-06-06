@@ -2,23 +2,25 @@
  ** Copyright 2024 Robotic Systems Lab - ETH Zurich:
  ** Remo Diethelm, Christian Gehring, Samuel Bachmann, Philipp Leeman, Lennart Nachtigall, Jonas Junger, Jan Preisig,
  ** Fabian Tischhauser, Johannes Pankert
- ** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions
- *are met:
+ ** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+ *following conditions are met:
  **
- ** 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ ** 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+ *disclaimer.
  **
- ** 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the
- *documentation and/or other materials provided with the distribution.
+ ** 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ *following disclaimer in the documentation and/or other materials provided with the distribution.
  **
- ** 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from
- *this software without specific prior written permission.
+ ** 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote
+ *products derived from this software without specific prior written permission.
  **
- ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- *LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- *LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- *USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ *INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ *DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ *SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ *WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ *OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 // std
@@ -31,18 +33,18 @@
 namespace rsl_drive_sdk
 {
 
-DriveCollection::DriveCollection(const DrivesVector & drives)
-: shutdownRequested_(false),
-  drives_(drives)
+DriveCollection::DriveCollection(const DrivesVector& drives) : shutdownRequested_(false), drives_(drives)
 {
 #ifndef NDEBUG
   MELO_WARN_STREAM("CMake Build Type is 'Debug'. Change to 'Release' for better performance.");
 #endif
 }
 
-DriveCollection::~DriveCollection() {}
+DriveCollection::~DriveCollection()
+{
+}
 
-bool DriveCollection::addDrive(const DriveEthercatDevice::SharedPtr & drive)
+bool DriveCollection::addDrive(const DriveEthercatDevice::SharedPtr& drive)
 {
   const std::string name = drive->getName();
   if (driveExists(name)) {
@@ -53,9 +55,9 @@ bool DriveCollection::addDrive(const DriveEthercatDevice::SharedPtr & drive)
   return true;
 }
 
-bool DriveCollection::driveExists(const std::string & name) const
+bool DriveCollection::driveExists(const std::string& name) const
 {
-  for (const auto & rsl_drive_sdk : drives_) {
+  for (const auto& rsl_drive_sdk : drives_) {
     if (rsl_drive_sdk->getName() == name) {
       return true;
     }
@@ -63,9 +65,9 @@ bool DriveCollection::driveExists(const std::string & name) const
   return false;
 }
 
-DriveEthercatDevice::SharedPtr DriveCollection::getDrive(const std::string & name) const
+DriveEthercatDevice::SharedPtr DriveCollection::getDrive(const std::string& name) const
 {
-  for (auto & rsl_drive_sdk : drives_) {
+  for (auto& rsl_drive_sdk : drives_) {
     if (rsl_drive_sdk->getName() == name) {
       return rsl_drive_sdk;
     }
@@ -83,13 +85,10 @@ size_t DriveCollection::getNumberOfDrives() const
   return drives_.size();
 }
 
-bool DriveCollection::setGoalStatesEnum(
-  const fsm::StateEnum goalStateEnum,
-  const bool reachStates,
-  const double timeout,
-  const double checkingFrequency)
+bool DriveCollection::setGoalStatesEnum(const fsm::StateEnum goalStateEnum, const bool reachStates,
+                                        const double timeout, const double checkingFrequency)
 {
-  for (const auto & rsl_drive_sdk : drives_) {
+  for (const auto& rsl_drive_sdk : drives_) {
     rsl_drive_sdk->setFSMGoalState(goalStateEnum, false, 0.0, 100.0);
   }
 
@@ -104,9 +103,8 @@ bool DriveCollection::setGoalStatesEnum(
       return false;
     }
     bool goalStatesHaveBeenReached = true;
-    for (const auto & rsl_drive_sdk : drives_) {
-      goalStatesHaveBeenReached = goalStatesHaveBeenReached &&
-        rsl_drive_sdk->goalStateHasBeenReached();
+    for (const auto& rsl_drive_sdk : drives_) {
+      goalStatesHaveBeenReached = goalStatesHaveBeenReached && rsl_drive_sdk->goalStateHasBeenReached();
     }
     if (goalStatesHaveBeenReached) {
       return true;
@@ -118,14 +116,14 @@ bool DriveCollection::setGoalStatesEnum(
 
 void DriveCollection::clearGoalStatesEnum()
 {
-  for (const auto & rsl_drive_sdk : drives_) {
+  for (const auto& rsl_drive_sdk : drives_) {
     rsl_drive_sdk->clearGoalStateEnum();
   }
 }
 
 bool DriveCollection::allDevicesAreConnected() const
 {
-  for (const auto & rsl_drive_sdk : drives_) {
+  for (const auto& rsl_drive_sdk : drives_) {
     if (rsl_drive_sdk->deviceIsMissing()) {
       return false;
     }
@@ -139,17 +137,16 @@ bool DriveCollection::allDevicesAreInTheState(const fsm::StateEnum stateEnum) co
     return false;
   }
 
-  for (const auto & rsl_drive_sdk : drives_) {
+  for (const auto& rsl_drive_sdk : drives_) {
     if (rsl_drive_sdk->getActiveStateEnum() != stateEnum) {
       return false;
     }
   }
 
-
   return true;
 }
 
-bool DriveCollection::allDevicesAreInTheSameState(fsm::StateEnum & stateEnum) const
+bool DriveCollection::allDevicesAreInTheSameState(fsm::StateEnum& stateEnum) const
 {
   if (getNumberOfDrives() == 0) {
     stateEnum = fsm::StateEnum::NA;
@@ -157,7 +154,7 @@ bool DriveCollection::allDevicesAreInTheSameState(fsm::StateEnum & stateEnum) co
   }
 
   bool stateEnumSet = false;
-  for (const auto & rsl_drive_sdk : drives_) {
+  for (const auto& rsl_drive_sdk : drives_) {
     if (!stateEnumSet) {
       stateEnum = rsl_drive_sdk->getActiveStateEnum();
       stateEnumSet = true;
@@ -177,7 +174,7 @@ bool DriveCollection::allDevicesAreInTheMode(const mode::ModeEnum modeEnum) cons
     return false;
   }
 
-  for (const auto & rsl_drive_sdk : drives_) {
+  for (const auto& rsl_drive_sdk : drives_) {
     if (rsl_drive_sdk->getStatusword().getModeEnum() != modeEnum) {
       return false;
     }
@@ -185,7 +182,7 @@ bool DriveCollection::allDevicesAreInTheMode(const mode::ModeEnum modeEnum) cons
   return true;
 }
 
-bool DriveCollection::allDevicesAreInTheSameMode(mode::ModeEnum & modeEnum) const
+bool DriveCollection::allDevicesAreInTheSameMode(mode::ModeEnum& modeEnum) const
 {
   if (getNumberOfDrives() == 0) {
     modeEnum = mode::ModeEnum::NA;
@@ -193,7 +190,7 @@ bool DriveCollection::allDevicesAreInTheSameMode(mode::ModeEnum & modeEnum) cons
   }
 
   bool modeEnumSet = false;
-  for (const auto & rsl_drive_sdk : drives_) {
+  for (const auto& rsl_drive_sdk : drives_) {
     if (!modeEnumSet) {
       modeEnum = rsl_drive_sdk->getStatusword().getModeEnum();
       modeEnumSet = true;
@@ -209,7 +206,7 @@ bool DriveCollection::allDevicesAreInTheSameMode(mode::ModeEnum & modeEnum) cons
 
 bool DriveCollection::noDeviceIsInErrorState() const
 {
-  for (const auto & rsl_drive_sdk : drives_) {
+  for (const auto& rsl_drive_sdk : drives_) {
     if (rsl_drive_sdk->deviceIsInErrorState()) {
       return false;
     }
@@ -220,7 +217,7 @@ bool DriveCollection::noDeviceIsInErrorState() const
 
 bool DriveCollection::noDeviceIsInFatalState() const
 {
-  for (const auto & rsl_drive_sdk : drives_) {
+  for (const auto& rsl_drive_sdk : drives_) {
     if (rsl_drive_sdk->deviceIsInFatalState()) {
       return false;
     }
@@ -231,7 +228,7 @@ bool DriveCollection::noDeviceIsInFatalState() const
 
 bool DriveCollection::allDevicesAreWithinJointPositionLimitsSoft() const
 {
-  for (const auto & rsl_drive_sdk : drives_) {
+  for (const auto& rsl_drive_sdk : drives_) {
     if (!rsl_drive_sdk->isWithinJointPositionLimitsSoft()) {
       return false;
     }
@@ -241,7 +238,7 @@ bool DriveCollection::allDevicesAreWithinJointPositionLimitsSoft() const
 
 bool DriveCollection::allDevicesAreWithinJointPositionLimitsHard() const
 {
-  for (const auto & rsl_drive_sdk : drives_) {
+  for (const auto& rsl_drive_sdk : drives_) {
     if (!rsl_drive_sdk->isWithinJointPositionLimitsHard()) {
       return false;
     }
@@ -249,27 +246,27 @@ bool DriveCollection::allDevicesAreWithinJointPositionLimitsHard() const
   return true;
 }
 
-bool DriveCollection::calibrate(
-  const std::string & deviceName, const calibration::CalibrationModeEnum calibrationModeEnum,
-  const bool gearAndJointEncoderHomingAbsolute,
-  const double gearAndJointEncoderHomingNewJointPosition)
+bool DriveCollection::calibrate(const std::string& deviceName,
+                                const calibration::CalibrationModeEnum calibrationModeEnum,
+                                const bool gearAndJointEncoderHomingAbsolute,
+                                const double gearAndJointEncoderHomingNewJointPosition)
 {
   auto rsl_drive_sdk = getDrive(deviceName);
   DriveCalibrator calibrator(rsl_drive_sdk);
   return calibrator.calibrate(calibrationModeEnum, gearAndJointEncoderHomingAbsolute,
-      gearAndJointEncoderHomingNewJointPosition);
+                              gearAndJointEncoderHomingNewJointPosition);
 }
 
 void DriveCollection::sendControlwords(const uint16_t controlwordId)
 {
-  for (const auto & rsl_drive_sdk : drives_) {
+  for (const auto& rsl_drive_sdk : drives_) {
     rsl_drive_sdk->setControlword(controlwordId);
   }
 }
 
 void DriveCollection::stageDisables()
 {
-  for (const auto & rsl_drive_sdk : drives_) {
+  for (const auto& rsl_drive_sdk : drives_) {
     Command command;
     command.setModeEnum(mode::ModeEnum::Disable);
     rsl_drive_sdk->setCommand(command);
@@ -278,7 +275,7 @@ void DriveCollection::stageDisables()
 
 void DriveCollection::stageFreezes()
 {
-  for (const auto & rsl_drive_sdk : drives_) {
+  for (const auto& rsl_drive_sdk : drives_) {
     Command command;
     command.setModeEnum(mode::ModeEnum::Freeze);
     rsl_drive_sdk->setCommand(command);
@@ -287,22 +284,21 @@ void DriveCollection::stageFreezes()
 
 void DriveCollection::stageZeroJointTorques()
 {
-  for (const auto & rsl_drive_sdk : drives_) {
+  for (const auto& rsl_drive_sdk : drives_) {
     Command command;
     command.setModeEnum(mode::ModeEnum::JointTorque);
     rsl_drive_sdk->setCommand(command);
   }
 }
 
-void DriveCollection::setCommands(const std::vector<Command> & commands)
+void DriveCollection::setCommands(const std::vector<Command>& commands)
 {
   assert(commands.size() == drives_.size());
   unsigned int i = 0;
-  for (const auto & rsl_drive_sdk : drives_) {
+  for (const auto& rsl_drive_sdk : drives_) {
     rsl_drive_sdk->setCommand(commands[i]);
     i++;
   }
 }
 
-
-} // rsl_drive_sdk
+}  // namespace rsl_drive_sdk

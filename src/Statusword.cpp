@@ -2,62 +2,68 @@
  ** Copyright 2024 Robotic Systems Lab - ETH Zurich:
  ** Remo Diethelm, Christian Gehring, Samuel Bachmann, Philipp Leeman, Lennart Nachtigall, Jonas Junger, Jan Preisig,
  ** Fabian Tischhauser, Johannes Pankert
- ** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions
- *are met:
+ ** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+ *following conditions are met:
  **
- ** 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ ** 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+ *disclaimer.
  **
- ** 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the
- *documentation and/or other materials provided with the distribution.
+ ** 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ *following disclaimer in the documentation and/or other materials provided with the distribution.
  **
- ** 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from
- *this software without specific prior written permission.
+ ** 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote
+ *products derived from this software without specific prior written permission.
  **
- ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- *LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- *LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- *USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ *INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ *DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ *SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ *WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ *OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // rsl_drive_sdk
 #include "rsl_drive_sdk/Statusword.hpp"
 
-
 namespace rsl_drive_sdk
 {
 
+Statusword::Data::Data()
+{
+}
 
-Statusword::Data::Data() {}
+Statusword::Data::Data(const uint32_t data) : all_(data)
+{
+}
 
-Statusword::Data::Data(const uint32_t data)
-: all_(data) {}
-
-bool Statusword::Data::operator==(const Data & other)
+bool Statusword::Data::operator==(const Data& other)
 {
   return all_ == other.all_;
 }
 
-bool Statusword::Data::operator!=(const Data & other)
+bool Statusword::Data::operator!=(const Data& other)
 {
   return !(*this == other);
 }
 
+Statusword::Statusword()
+{
+}
 
-Statusword::Statusword() {}
-
-Statusword::Statusword(const Statusword & statusword)
-: stamp_(statusword.getStamp()),
-  data_(statusword.getData()) {}
+Statusword::Statusword(const Statusword& statusword) : stamp_(statusword.getStamp()), data_(statusword.getData())
+{
+}
 
 Statusword::Statusword(uint32_t data)
 {
   setData(data);
 }
 
-Statusword::~Statusword() {}
+Statusword::~Statusword()
+{
+}
 
-Statusword & Statusword::operator=(const Statusword & statusword)
+Statusword& Statusword::operator=(const Statusword& statusword)
 {
   std::lock_guard<std::recursive_mutex> lock(mutex_);
   stamp_ = statusword.getStamp();
@@ -97,7 +103,7 @@ uint32_t Statusword::getData() const
   return data_.all_;
 }
 
-Statusword::Data & Statusword::getDataField()
+Statusword::Data& Statusword::getDataField()
 {
   std::lock_guard<std::recursive_mutex> lock(mutex_);
   return data_;
@@ -129,36 +135,26 @@ void Statusword::setModeEnum(const mode::ModeEnum modeEnum)
   data_.bits_.modeId_ = mode::modeEnumToId(modeEnum);
 }
 
-void Statusword::getMessages(
-  std::vector<std::string> & infos,
-  std::vector<std::string> & warnings,
-  std::vector<std::string> & errors,
-  std::vector<std::string> & fatals) const
+void Statusword::getMessages(std::vector<std::string>& infos, std::vector<std::string>& warnings,
+                             std::vector<std::string>& errors, std::vector<std::string>& fatals) const
 {
   Statusword previousStatusword;
   return getMessagesDiff(previousStatusword, infos, warnings, errors, fatals);
 }
 
-void Statusword::getMessagesDiff(
-  Statusword & previousStatusword,
-  std::vector<std::string> & infos,
-  std::vector<std::string> & warnings,
-  std::vector<std::string> & errors,
-  std::vector<std::string> & fatals) const
+void Statusword::getMessagesDiff(Statusword& previousStatusword, std::vector<std::string>& infos,
+                                 std::vector<std::string>& warnings, std::vector<std::string>& errors,
+                                 std::vector<std::string>& fatals) const
 {
   // Warnings.
   if (!previousStatusword.hasWarningHighTemperatureBridge() && hasWarningHighTemperatureBridge()) {
     warnings.push_back("Warning: High power stage temperature.");
-  } else if (previousStatusword.hasWarningHighTemperatureBridge() &&
-    !hasWarningHighTemperatureBridge())
-  {
+  } else if (previousStatusword.hasWarningHighTemperatureBridge() && !hasWarningHighTemperatureBridge()) {
     infos.push_back("Warning disappeared: High power stage temperature.");
   }
   if (!previousStatusword.hasWarningHighTemperatureStator() && hasWarningHighTemperatureStator()) {
     warnings.push_back("Warning: High electric motor temperature.");
-  } else if (previousStatusword.hasWarningHighTemperatureStator() &&
-    !hasWarningHighTemperatureStator())
-  {
+  } else if (previousStatusword.hasWarningHighTemperatureStator() && !hasWarningHighTemperatureStator()) {
     infos.push_back("Warning disappeared: High electric motor temperature.");
   }
   if (!previousStatusword.hasWarningHighTemperatureCpu() && hasWarningHighTemperatureCpu()) {
@@ -168,9 +164,7 @@ void Statusword::getMessagesDiff(
   }
   if (!previousStatusword.hasWarningEncoderOutlierMotor() && hasWarningEncoderOutlierMotor()) {
     warnings.push_back("Warning: Motor encoder outlier.");
-  } else if (previousStatusword.hasWarningEncoderOutlierMotor() &&
-    !hasWarningEncoderOutlierMotor())
-  {
+  } else if (previousStatusword.hasWarningEncoderOutlierMotor() && !hasWarningEncoderOutlierMotor()) {
     infos.push_back("Warning disappeared: Motor encoder outlier.");
   }
   if (!previousStatusword.hasWarningEncoderOutlierGear() && hasWarningEncoderOutlierGear()) {
@@ -180,16 +174,12 @@ void Statusword::getMessagesDiff(
   }
   if (!previousStatusword.hasWarningEncoderOutlierJoint() && hasWarningEncoderOutlierJoint()) {
     warnings.push_back("Warning: Joint encoder outlier.");
-  } else if (previousStatusword.hasWarningEncoderOutlierJoint() &&
-    !hasWarningEncoderOutlierJoint())
-  {
+  } else if (previousStatusword.hasWarningEncoderOutlierJoint() && !hasWarningEncoderOutlierJoint()) {
     infos.push_back("Warning disappeared: Joint encoder outlier.");
   }
   if (!previousStatusword.hasWarningIncompleteCalibration() && hasWarningIncompleteCalibration()) {
     warnings.push_back("Warning: Incomplete calibration.");
-  } else if (previousStatusword.hasWarningIncompleteCalibration() &&
-    !hasWarningIncompleteCalibration())
-  {
+  } else if (previousStatusword.hasWarningIncompleteCalibration() && !hasWarningIncompleteCalibration()) {
     infos.push_back("Warning disappeared: Incomplete calibration.");
   }
   if (!previousStatusword.hasWarningEncoderCrcGear() && hasWarningEncoderCrcGear()) {
@@ -216,9 +206,7 @@ void Statusword::getMessagesDiff(
   }
   if (!previousStatusword.hasErrorInvalidElecZeroOffset() && hasErrorInvalidElecZeroOffset()) {
     errors.push_back("Error: Direct Drive Elec Zero Offset Invalid.");
-  } else if (previousStatusword.hasErrorInvalidElecZeroOffset() &&
-    !hasErrorInvalidElecZeroOffset())
-  {
+  } else if (previousStatusword.hasErrorInvalidElecZeroOffset() && !hasErrorInvalidElecZeroOffset()) {
     infos.push_back("Error disappeared:  Direct Drive Elec Zero Offset Invalid");
   }
   if (!previousStatusword.hasErrorMaxVelocityExceeded() && hasErrorMaxVelocityExceeded()) {
@@ -228,25 +216,19 @@ void Statusword::getMessagesDiff(
   }
   if (!previousStatusword.hasErrorJointPositionLimitsSoft() && hasErrorJointPositionLimitsSoft()) {
     errors.push_back("Error: Reached soft joint position limits.");
-  } else if (previousStatusword.hasErrorJointPositionLimitsSoft() &&
-    !hasErrorJointPositionLimitsSoft())
-  {
+  } else if (previousStatusword.hasErrorJointPositionLimitsSoft() && !hasErrorJointPositionLimitsSoft()) {
     infos.push_back("Error disappeared: Reached soft joint position limits.");
   }
 
   // Fatals.
   if (!previousStatusword.hasFatalOvertemperatureBridge() && hasFatalOvertemperatureBridge()) {
     fatals.push_back("Fatal: Power stage overtemperature.");
-  } else if (previousStatusword.hasFatalOvertemperatureBridge() &&
-    !hasFatalOvertemperatureBridge())
-  {
+  } else if (previousStatusword.hasFatalOvertemperatureBridge() && !hasFatalOvertemperatureBridge()) {
     infos.push_back("Fatal disappeared: Power stage overtemperature.");
   }
   if (!previousStatusword.hasFatalOvertemperatureStator() && hasFatalOvertemperatureStator()) {
     fatals.push_back("Fatal: Electric motor overtemperature.");
-  } else if (previousStatusword.hasFatalOvertemperatureStator() &&
-    !hasFatalOvertemperatureStator())
-  {
+  } else if (previousStatusword.hasFatalOvertemperatureStator() && !hasFatalOvertemperatureStator()) {
     infos.push_back("Fatal disappeared: Electric motor overtemperature.");
   }
   if (!previousStatusword.hasFatalOvertemperatureCpu() && hasFatalOvertemperatureCpu()) {
@@ -256,9 +238,7 @@ void Statusword::getMessagesDiff(
   }
   if (!previousStatusword.hasFatalJointPositionLimitsHard() && hasFatalJointPositionLimitsHard()) {
     fatals.push_back("Fatal: Reached hard joint position limits.");
-  } else if (previousStatusword.hasFatalJointPositionLimitsHard() &&
-    !hasFatalJointPositionLimitsHard())
-  {
+  } else if (previousStatusword.hasFatalJointPositionLimitsHard() && !hasFatalJointPositionLimitsHard()) {
     infos.push_back("Fatal disappeared: Reached hard joint position limits.");
   }
   if (!previousStatusword.hasFatalMotorEncoder() && hasFatalMotorEncoder()) {
@@ -426,7 +406,7 @@ bool Statusword::hasFatalJointMotorEncoder() const
   return data_.bits_.fatal_joint_motor_encoder;
 }
 
-std::ostream & operator<<(std::ostream & os, const Statusword & statusword)
+std::ostream& operator<<(std::ostream& os, const Statusword& statusword)
 {
   for (uint32_t i = 8 * sizeof(uint32_t); i > uint32_t(0); i--) {
     os << ((statusword.getData() & (uint32_t(1) << (i - uint32_t(1)))) ? "1" : "0");
@@ -434,5 +414,4 @@ std::ostream & operator<<(std::ostream & os, const Statusword & statusword)
   return os;
 }
 
-
-} // rsl_drive_sdk
+}  // namespace rsl_drive_sdk

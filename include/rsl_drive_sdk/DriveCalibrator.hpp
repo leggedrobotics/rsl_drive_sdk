@@ -2,23 +2,25 @@
  ** Copyright 2024 Robotic Systems Lab - ETH Zurich:
  ** Remo Diethelm, Christian Gehring, Samuel Bachmann, Philipp Leeman, Lennart Nachtigall, Jonas Junger, Jan Preisig,
  ** Fabian Tischhauser, Johannes Pankert
- ** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions
- *are met:
+ ** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+ *following conditions are met:
  **
- ** 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ ** 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+ *disclaimer.
  **
- ** 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the
- *documentation and/or other materials provided with the distribution.
+ ** 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ *following disclaimer in the documentation and/or other materials provided with the distribution.
  **
- ** 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from
- *this software without specific prior written permission.
+ ** 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote
+ *products derived from this software without specific prior written permission.
  **
- ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- *LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- *LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- *USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ *INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ *DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ *SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ *WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ *OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #pragma once
 
@@ -26,37 +28,35 @@
 
 namespace rsl_drive_sdk
 {
-  class DriveCalibrator
+class DriveCalibrator
+{
+public:
+  explicit DriveCalibrator(DriveEthercatDevice::SharedPtr drive);
+
+  bool calibrate(const calibration::CalibrationModeEnum calibrationModeEnum,
+                 const bool gearAndJointEncoderHomingAbsolute = true,
+                 const double gearAndJointEncoderHomingNewJointPosition = 0.0);
+
+  /**
+   * @brief start_calibration - run calibration non blocking
+   * @return false also long as calibration is running
+   * @throws on error
+   */
+  void start_calibration(const calibration::CalibrationModeEnum calibrationModeEnum,
+                         const bool gearAndJointEncoderHomingAbsolute = true,
+                         const double gearAndJointEncoderHomingNewJointPosition = 0.0);
+
+  /**
+   * @brief is_calibration_running - check if there is currently a calibration running
+   */
+  bool is_calibration_running()
   {
-  public:
-    DriveCalibrator(DriveEthercatDevice::SharedPtr drive);
+    bool calib_running = true;
+    _drive->calibrationIsRunning(calib_running);
+    return calib_running;
+  }
 
-    bool calibrate(
-        const calibration::CalibrationModeEnum calibrationModeEnum,
-        const bool gearAndJointEncoderHomingAbsolute = true,
-        const double gearAndJointEncoderHomingNewJointPosition = 0.0);
-
-    /**
-     * @brief start_calibration - run calibration non blocking
-     * @return false als long as calibration is running
-     * @throws on error
-     */
-    void start_calibration(
-        const calibration::CalibrationModeEnum calibrationModeEnum,
-        const bool gearAndJointEncoderHomingAbsolute = true,
-        const double gearAndJointEncoderHomingNewJointPosition = 0.0);
-
-    /**
-     * @brief is_calibration_running - check if there is currently a calibration running
-     */
-    bool is_calibration_running()
-    {
-      bool calib_running = true;
-      _drive->calibrationIsRunning(calib_running);
-      return calib_running;
-    }
-
-  private:
-    DriveEthercatDevice::SharedPtr _drive;
-  };
-}
+private:
+  DriveEthercatDevice::SharedPtr _drive;
+};
+}  // namespace rsl_drive_sdk

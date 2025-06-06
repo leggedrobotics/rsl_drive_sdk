@@ -2,23 +2,25 @@
  ** Copyright 2024 Robotic Systems Lab - ETH Zurich:
  ** Remo Diethelm, Christian Gehring, Samuel Bachmann, Philipp Leeman, Lennart Nachtigall, Jonas Junger, Jan Preisig,
  ** Fabian Tischhauser, Johannes Pankert
- ** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions
- *are met:
+ ** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+ *following conditions are met:
  **
- ** 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ ** 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+ *disclaimer.
  **
- ** 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the
- *documentation and/or other materials provided with the distribution.
+ ** 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ *following disclaimer in the documentation and/or other materials provided with the distribution.
  **
- ** 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from
- *this software without specific prior written permission.
+ ** 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote
+ *products derived from this software without specific prior written permission.
  **
- ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- *LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- *LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- *USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ *INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ *DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ *SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ *WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ *OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // rsl_drive_sdk
 #include "rsl_drive_sdk/configuration/DriveConfiguration.hpp"
@@ -43,19 +45,17 @@ namespace rsl_drive_sdk
 namespace configuration
 {
 
-
 Configuration::Configuration()
-: errorStateBehavior_(0),
-  maxCurrent_(28.0),
-  maxMotorVelocity_(680.7),
-  direction_(1),
-  imuEnable_(true),
-  imuAccelerometerRange_(1),
-  imuGyroscopeRange_(1),
-  fake_(false)
+  : errorStateBehavior_(0)
+  , maxCurrent_(28.0)
+  , maxMotorVelocity_(680.7)
+  , direction_(1)
+  , imuEnable_(true)
+  , imuAccelerometerRange_(1)
+  , imuGyroscopeRange_(1)
+  , fake_(false)
 {
-
-    //std::lock_guard<std::recursive_mutex> lock(mutex_);
+  // std::lock_guard<std::recursive_mutex> lock(mutex_);
   addMode(mode::ModeBasePtr(new mode::ModeCurrent()));
   addMode(mode::ModeBasePtr(new mode::ModeJointPositionTorque()));
   addMode(mode::ModeBasePtr(new mode::ModeDisable()));
@@ -72,14 +72,13 @@ Configuration::Configuration()
   addMode(mode::ModeBasePtr(new mode::ModeMotorVelocity()));
 }
 
-Configuration::Configuration(const Configuration & other)
+Configuration::Configuration(const Configuration& other)
 {
   *this = other;
 }
 
-Configuration & Configuration::operator=(const Configuration & other)
+Configuration& Configuration::operator=(const Configuration& other)
 {
-
   maxCommandAge_ = other.getMaxCommandAge();
   autoStageLastCommand_ = other.getAutoStageLastCommand();
   setReadingToNanOnDisconnect_ = other.getSetReadingToNanOnDisconnect();
@@ -98,9 +97,8 @@ Configuration & Configuration::operator=(const Configuration & other)
   jointPositionLimitsSoft_ = other.getJointPositionLimitsSoft();
   jointPositionLimitsHard_ = other.getJointPositionLimitsHard();
 
-  for (const auto & jointPositionConfiguration : other.getJointPositionConfigurations()) {
-    addJointPositionConfiguration(jointPositionConfiguration.first,
-          jointPositionConfiguration.second);
+  for (const auto& jointPositionConfiguration : other.getJointPositionConfigurations()) {
+    addJointPositionConfiguration(jointPositionConfiguration.first, jointPositionConfiguration.second);
   }
 
   imuEnable_ = other.getImuEnable();
@@ -112,8 +110,7 @@ Configuration & Configuration::operator=(const Configuration & other)
   fanLowerTemperature_ = other.getFanLowerTemperature();
   fanUpperTemperature_ = other.getFanUpperTemperature();
 
-
-  for (const auto & mode : other.getModes()) {
+  for (const auto& mode : other.getModes()) {
     if (mode.second->getPidGains()) {
       getMode(mode.first)->setPidGains(mode.second->getPidGains().value());
     }
@@ -129,8 +126,7 @@ Configuration & Configuration::operator=(const Configuration & other)
   gearJointVelocityEmaAlpha_ = other.getGearJointVelocityEmaAlpha();
 
   jointVelocityForAccelerationFilterType_ = other.getJointVelocityForAccelerationFilterType();
-  jointVelocityForAccelerationKfNoiseVariance_ =
-    other.getJointVelocityForAccelerationKfNoiseVariance();
+  jointVelocityForAccelerationKfNoiseVariance_ = other.getJointVelocityForAccelerationKfNoiseVariance();
   jointVelocityForAccelerationKfLambda2_ = other.getJointVelocityForAccelerationKfLambda2();
   jointVelocityForAccelerationKfGamma_ = other.getJointVelocityForAccelerationKfGamma();
   jointVelocityForAccelerationEmaAlpha_ = other.getJointVelocityForAccelerationEmaAlpha();
@@ -144,7 +140,6 @@ Configuration & Configuration::operator=(const Configuration & other)
   fake_ = other.fake_;
   return *this;
 }
-
 
 void Configuration::setMaxCommandAge(const double maxCommandAge)
 {
@@ -288,7 +283,7 @@ std::optional<int16_t> Configuration::getDirection() const
   return direction_;
 }
 
-void Configuration::setJointPositionLimitsSdk(const common::Limits & limits)
+void Configuration::setJointPositionLimitsSdk(const common::Limits& limits)
 {
   std::lock_guard<std::recursive_mutex> lock(mutex_);
   jointPositionLimitsSdk_ = limits;
@@ -300,7 +295,7 @@ std::optional<common::Limits> Configuration::getJointPositionLimitsSdk() const
   return jointPositionLimitsSdk_;
 }
 
-void Configuration::setJointPositionLimitsSoft(const common::Limits & limits)
+void Configuration::setJointPositionLimitsSoft(const common::Limits& limits)
 {
   std::lock_guard<std::recursive_mutex> lock(mutex_);
   jointPositionLimitsSoft_ = limits;
@@ -312,7 +307,7 @@ std::optional<common::Limits> Configuration::getJointPositionLimitsSoft() const
   return jointPositionLimitsSoft_;
 }
 
-void Configuration::setJointPositionLimitsHard(const common::Limits & limits)
+void Configuration::setJointPositionLimitsHard(const common::Limits& limits)
 {
   std::lock_guard<std::recursive_mutex> lock(mutex_);
   jointPositionLimitsHard_ = limits;
@@ -324,17 +319,15 @@ std::optional<common::Limits> Configuration::getJointPositionLimitsHard() const
   return jointPositionLimitsHard_;
 }
 
-void Configuration::addJointPositionConfiguration(
-  const std::string & jointPositionConfigurationName, double jointPositionConfigurationValue)
+void Configuration::addJointPositionConfiguration(const std::string& jointPositionConfigurationName,
+                                                  double jointPositionConfigurationValue)
 {
   std::lock_guard<std::recursive_mutex> lock(mutex_);
-  jointPositionConfigurations_.insert({jointPositionConfigurationName,
-      jointPositionConfigurationValue});
+  jointPositionConfigurations_.insert({ jointPositionConfigurationName, jointPositionConfigurationValue });
 }
 
-bool Configuration::getJointPositionConfigurationValue(
-  const std::string & jointPositionConfigurationName,
-  double & jointPositionConfigurationValue) const
+bool Configuration::getJointPositionConfigurationValue(const std::string& jointPositionConfigurationName,
+                                                       double& jointPositionConfigurationValue) const
 {
   std::lock_guard<std::recursive_mutex> lock(mutex_);
   auto it = jointPositionConfigurations_.find(jointPositionConfigurationName);
@@ -632,7 +625,6 @@ mode::ModeBasePtr Configuration::getMode(const mode::ModeEnum modeEnum) const
   std::lock_guard<std::recursive_mutex> lock(mutex_);
   auto it = modes_.find(modeEnum);
 
-
   if (it == modes_.end()) {
     MELO_ERROR_STREAM("Mode does not exist: " << modeEnum);
     return mode::ModeBasePtr();
@@ -710,12 +702,11 @@ bool Configuration::getFake() const
   return fake_;
 }
 
-void Configuration::addMode(const mode::ModeBasePtr & mode)
+void Configuration::addMode(const mode::ModeBasePtr& mode)
 {
   std::lock_guard<std::recursive_mutex> lock(mutex_);
-  modes_.insert({mode->getModeEnum(), mode});
+  modes_.insert({ mode->getModeEnum(), mode });
 }
 
-
-} // configuration
-} // rsl_drive_sdk
+}  // namespace configuration
+}  // namespace rsl_drive_sdk

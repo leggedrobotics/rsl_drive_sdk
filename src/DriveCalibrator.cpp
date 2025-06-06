@@ -2,23 +2,25 @@
  ** Copyright 2024 Robotic Systems Lab - ETH Zurich:
  ** Remo Diethelm, Christian Gehring, Samuel Bachmann, Philipp Leeman, Lennart Nachtigall, Jonas Junger, Jan Preisig,
  ** Fabian Tischhauser, Johannes Pankert
- ** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions
- *are met:
+ ** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+ *following conditions are met:
  **
- ** 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ ** 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+ *disclaimer.
  **
- ** 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the
- *documentation and/or other materials provided with the distribution.
+ ** 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ *following disclaimer in the documentation and/or other materials provided with the distribution.
  **
- ** 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from
- *this software without specific prior written permission.
+ ** 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote
+ *products derived from this software without specific prior written permission.
  **
- ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- *LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- *LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- *USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ *INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ *DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ *SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ *WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ *OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "rsl_drive_sdk/DriveCalibrator.hpp"
@@ -27,25 +29,23 @@
 namespace rsl_drive_sdk
 {
 
-  DriveCalibrator::DriveCalibrator(DriveEthercatDevice::SharedPtr drive)
-      : _drive(drive)
-  {
-  }
+DriveCalibrator::DriveCalibrator(DriveEthercatDevice::SharedPtr drive) : _drive(drive)
+{
+}
 
-  bool DriveCalibrator::calibrate(
-      const calibration::CalibrationModeEnum calibrationModeEnum,
-      const bool gearAndJointEncoderHomingAbsolute,
-      const double gearAndJointEncoderHomingNewJointPosition)
-  {
-    // 1. Check if drive is calibrate state
-    if (_drive->getActiveStateEnum() != fsm::StateEnum::Calibrate)
-    {
-      MELO_ERROR_STREAM("Device: " << _drive->getName() << ":" << _drive->getAddress() << " needs to be in calibrate state for calibration, is in: " << _drive->getActiveStateEnum());
-      return false;
-    }
-    using cme = calibration::CalibrationModeEnum;
-    switch (calibrationModeEnum)
-    {
+bool DriveCalibrator::calibrate(const calibration::CalibrationModeEnum calibrationModeEnum,
+                                const bool gearAndJointEncoderHomingAbsolute,
+                                const double gearAndJointEncoderHomingNewJointPosition)
+{
+  // 1. Check if drive is calibrate state
+  if (_drive->getActiveStateEnum() != fsm::StateEnum::Calibrate) {
+    MELO_ERROR_STREAM("Device: " << _drive->getName() << ":" << _drive->getAddress()
+                                 << " needs to be in calibrate state for calibration, is in: "
+                                 << _drive->getActiveStateEnum());
+    return false;
+  }
+  using cme = calibration::CalibrationModeEnum;
+  switch (calibrationModeEnum) {
     case cme::GearAndJointEncoderHoming:
     {
       /* First send new joint position (it will be wrapped in the firmware if outside of [-pi, pi)).
@@ -54,8 +54,7 @@ namespace rsl_drive_sdk
        * Relative: The new joint position will be set as the new zero.
        */
       double newJointPosition = gearAndJointEncoderHomingNewJointPosition;
-      if (!gearAndJointEncoderHomingAbsolute)
-      {
+      if (!gearAndJointEncoderHomingAbsolute) {
         ReadingExtended reading;
         _drive->getReading(reading);
         newJointPosition += reading.getState().getJointPosition();
@@ -77,40 +76,36 @@ namespace rsl_drive_sdk
       _drive->startCalibration(calibrationModeEnum);
       bool calib_running = true;
       size_t runs = 0;
-      while (calib_running)
-      {
+      while (calib_running) {
         _drive->calibrationIsRunning(calib_running);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         runs++;
-        if (runs > 4000)
-        { // More than 240s
+        if (runs > 4000) {  // More than 240s
           return false;
         }
       }
       return true;
-    }
-    break;
+    } break;
     default:
       return false;
-    }
+  }
+}
+
+void DriveCalibrator::start_calibration(const calibration::CalibrationModeEnum calibrationModeEnum,
+                                        const bool gearAndJointEncoderHomingAbsolute,
+                                        const double gearAndJointEncoderHomingNewJointPosition)
+{
+  // 1. Check if drive is calibrate state
+  if (_drive->getActiveStateEnum() != fsm::StateEnum::Calibrate) {
+    MELO_ERROR_STREAM("Device: " << _drive->getName() << ":" << _drive->getAddress()
+                                 << " needs to be in calibrate state for calibration, is in: "
+                                 << _drive->getActiveStateEnum());
+    throw std::runtime_error("Device is not in calibration mode");
   }
 
-  void DriveCalibrator::start_calibration(
-      const calibration::CalibrationModeEnum calibrationModeEnum,
-      const bool gearAndJointEncoderHomingAbsolute ,
-      const double gearAndJointEncoderHomingNewJointPosition )
-  {
-    // 1. Check if drive is calibrate state
-    if (_drive->getActiveStateEnum() != fsm::StateEnum::Calibrate)
-    {
-      MELO_ERROR_STREAM("Device: " << _drive->getName() << ":" << _drive->getAddress() << " needs to be in calibrate state for calibration, is in: " << _drive->getActiveStateEnum());
-      throw std::runtime_error("Device is not in calibration mode");
-    }
+  using cme = calibration::CalibrationModeEnum;
 
-    using cme = calibration::CalibrationModeEnum;
-
-    switch (calibrationModeEnum)
-    {
+  switch (calibrationModeEnum) {
     case cme::GearAndJointEncoderHoming:
     {
       /* First send new joint position (it will be wrapped in the firmware if outside of [-pi, pi)).
@@ -119,8 +114,7 @@ namespace rsl_drive_sdk
        * Relative: The new joint position will be set as the new zero.
        */
       double newJointPosition = gearAndJointEncoderHomingNewJointPosition;
-      if (!gearAndJointEncoderHomingAbsolute)
-      {
+      if (!gearAndJointEncoderHomingAbsolute) {
         ReadingExtended reading;
         _drive->getReading(reading);
         newJointPosition += reading.getState().getJointPosition();
@@ -139,16 +133,13 @@ namespace rsl_drive_sdk
     case cme::MotorEncoderParameters:
     {
       MELO_INFO_STREAM("Starting calibration: " << calibrationModeEnum);
-      if (!_drive->startCalibration(calibrationModeEnum))
-      {
+      if (!_drive->startCalibration(calibrationModeEnum)) {
         throw std::runtime_error("Error starting calibration");
       }
-    }
-    break;
+    } break;
     default:
       return;
-    }
-    
   }
-
 }
+
+}  // namespace rsl_drive_sdk

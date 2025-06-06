@@ -2,26 +2,27 @@
  ** Copyright 2024 Robotic Systems Lab - ETH Zurich:
  ** Remo Diethelm, Christian Gehring, Samuel Bachmann, Philipp Leeman, Lennart Nachtigall, Jonas Junger, Jan Preisig,
  ** Fabian Tischhauser, Johannes Pankert
- ** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions
- *are met:
+ ** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+ *following conditions are met:
  **
- ** 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ ** 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+ *disclaimer.
  **
- ** 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the
- *documentation and/or other materials provided with the distribution.
+ ** 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ *following disclaimer in the documentation and/or other materials provided with the distribution.
  **
- ** 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from
- *this software without specific prior written permission.
+ ** 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote
+ *products derived from this software without specific prior written permission.
  **
- ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- *LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- *LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- *USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ *INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ *DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ *SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ *WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ *OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #pragma once
-
 
 // std
 #include <climits>
@@ -29,6 +30,8 @@
 #include <mutex>
 #include <string>
 #include <optional>
+#include <limits>
+#include <map>
 
 // yaml tools
 #include <yaml-cpp/yaml.h>
@@ -39,12 +42,10 @@
 #include "rsl_drive_sdk/fsm/StateEnum.hpp"
 #include "rsl_drive_sdk/mode/ModeBase.hpp"
 
-
 namespace rsl_drive_sdk
 {
 namespace configuration
 {
-
 
 class Configuration
 {
@@ -425,7 +426,6 @@ protected:
    */
   std::map<mode::ModeEnum, mode::ModeBasePtr> modes_;
 
-
   std::optional<float> dgainFilterCutoffFrequency_;
 
   /*!
@@ -455,13 +455,13 @@ protected:
 
 public:
   Configuration();
-  Configuration(const Configuration & other);
+  Configuration(const Configuration& other);
   virtual ~Configuration() = default;
 
-  Configuration & operator=(const Configuration & other);
+  Configuration& operator=(const Configuration& other);
 
-  void fromFile(const std::string & path);
-  void fromYamlNode(const YAML::Node & yamlNode);
+  void fromFile(const std::string& path);
+  void fromYamlNode(const YAML::Node& yamlNode);
 
   void setMaxCommandAge(const double maxCommandAge);
   double getMaxCommandAge() const;
@@ -496,21 +496,19 @@ public:
   void setDirection(const int16_t direction);
   std::optional<int16_t> getDirection() const;
 
-  void setJointPositionLimitsSdk(const common::Limits & limits);
+  void setJointPositionLimitsSdk(const common::Limits& limits);
   std::optional<common::Limits> getJointPositionLimitsSdk() const;
 
-  void setJointPositionLimitsSoft(const common::Limits & limits);
+  void setJointPositionLimitsSoft(const common::Limits& limits);
   std::optional<common::Limits> getJointPositionLimitsSoft() const;
 
-  void setJointPositionLimitsHard(const common::Limits & limits);
+  void setJointPositionLimitsHard(const common::Limits& limits);
   std::optional<common::Limits> getJointPositionLimitsHard() const;
 
-  void addJointPositionConfiguration(
-    const std::string & jointPositionConfigurationName,
-    const double jointPositionConfigurationValue);
-  bool getJointPositionConfigurationValue(
-    const std::string & jointPositionConfigurationName,
-    double & jointPositionConfigurationValue) const;
+  void addJointPositionConfiguration(const std::string& jointPositionConfigurationName,
+                                     const double jointPositionConfigurationValue);
+  bool getJointPositionConfigurationValue(const std::string& jointPositionConfigurationName,
+                                          double& jointPositionConfigurationValue) const;
   std::map<std::string, double> getJointPositionConfigurations() const;
 
   void setImuEnable(const bool enable);
@@ -595,9 +593,8 @@ public:
   bool getFake() const;
 
 protected:
-  void addMode(const mode::ModeBasePtr & mode);
+  void addMode(const mode::ModeBasePtr& mode);
 };
 
-
-} // configuration
-} // rsl_drive_sdk
+}  // namespace configuration
+}  // namespace rsl_drive_sdk

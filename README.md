@@ -1,4 +1,4 @@
-# rsl_drive_sdk 
+# rsl_drive_sdk
 
 Software Development Kit for all RSL drives.\
 The source code is released under  [BSD 3](LICENSE).
@@ -9,7 +9,7 @@ The source code is released under  [BSD 3](LICENSE).
 | ---|  --- |
 | Dynadrive | Fully supported, including calibration |
 | Halodi drives | Fully supported, including calibration |
-| Other | There are additional, but not officially supported drives | 
+| Other | There are additional, but not officially supported drives |
 
 
 ## Dependencies
@@ -18,15 +18,15 @@ The source code is released under  [BSD 3](LICENSE).
 
 | Repository | URL | License | Content |
 | --- | - | --- | --- |
-| ethercat_sdk_master | https://github.com/leggedrobotics/ethercat_sdk_master/tree/master/ethercat_sdk_master | BSD 3-Clause | Ethercat master implementation | 
-| soem_interface | https://github.com/leggedrobotics/soem_interface | GPLv3 | Wrapper around [SOEM](https://github.com/OpenEtherCATsociety/soem) | 
+| ethercat_sdk_master | https://github.com/leggedrobotics/ethercat_sdk_master/tree/master/ethercat_sdk_master | BSD 3-Clause | Ethercat master implementation |
+| soem_interface | https://github.com/leggedrobotics/soem_interface | GPLv3 | Wrapper around [SOME](https://github.com/OpenEtherCATsociety/some) |
 | message_logger | https://github.com/leggedrobotics/message_logger.git | BSD 3-Clause | Simple logger |
 
 #### Installable via rosdep:
 
 | Repository | URL | License | Content |
 | --- | - | --- | --- |
-| yaml_cpp_vendor |https://github.com/ros2/yaml_cpp_vendor | Apache 2.0 / MIT | yaml library | 
+| yaml_cpp_vendor |https://github.com/ros2/yaml_cpp_vendor | Apache 2.0 / MIT | yaml library |
 
 ## Usage
 
